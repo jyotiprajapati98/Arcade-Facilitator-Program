@@ -1,0 +1,19 @@
+export ZONE=
+
+gcloud services enable notebooks.googleapis.com
+
+gcloud services enable aiplatform.googleapis.com
+
+export NOTEBOOK_NAME="techsorter-jupyter"
+export MACHINE_TYPE="e2-standard-2"
+
+gcloud notebooks instances create $NOTEBOOK_NAME \
+  --location=$ZONE \
+  --vm-image-project=deeplearning-platform-release \
+  --vm-image-family=tf-2-11-cu113-notebooks \
+  --machine-type=$MACHINE_TYPE
+
+
+************Follow the video**************************************************
+
+git clone --depth=1 https://github.com/GoogleCloudPlatform/training-data-analyst
