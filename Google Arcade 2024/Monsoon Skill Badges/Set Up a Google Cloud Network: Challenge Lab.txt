@@ -1,0 +1,182 @@
+************TASK 1************
+
+gcloud services enable datamigration.googleapis.com
+
+gcloud services enable servicenetworking.googleapis.com
+
+export ZONE=$(gcloud compute instances list antern-postgresql-vm --format 'csv[no-heading](zone)')
+
+
+gcloud compute ssh antern-postgresql-vm --project=$DEVSHELL_PROJECT_ID --zone=$ZONE --quiet
+
+
+sudo apt-get update
+sudo apt-get install -y postgresql-13-pglogical
+
+sudo su - postgres -c "gsutil cp gs://cloud-training/gsp918/pg_hba_append.conf ."
+sudo su - postgres -c "gsutil cp gs://cloud-training/gsp918/postgresql_append.conf ."
+sudo su - postgres -c "cat pg_hba_append.conf >> /etc/postgresql/13/main/pg_hba.conf"
+sudo su - postgres -c "cat postgresql_append.conf >> /etc/postgresql/13/main/postgresql.conf"
+sudo systemctl restart postgresql@13-main
+sudo su - postgres
+
+
+
+psql
+
+\set user replication_user
+
+\c postgres;
+
+CREATE EXTENSION pglogical;
+
+\c orders;
+
+CREATE EXTENSION pglogical;
+
+CREATE DATABASE gmemegen_db;
+
+\c gmemegen_db;
+
+CREATE EXTENSION pglogical;
+
+\l
+
+CREATE USER :user PASSWORD 'DMS_1s_cool!';
+GRANT ALL PRIVILEGES ON DATABASE orders TO :user;
+ALTER DATABASE orders OWNER TO :user;
+ALTER ROLE :user WITH REPLICATION;
+
+\c postgres;
+
+GRANT USAGE ON SCHEMA pglogical TO :user;
+GRANT ALL ON SCHEMA pglogical TO :user;
+GRANT SELECT ON pglogical.tables TO :user;
+GRANT SELECT ON pglogical.depend TO :user;
+GRANT SELECT ON pglogical.local_node TO :user;
+GRANT SELECT ON pglogical.local_sync_status TO :user;
+GRANT SELECT ON pglogical.node TO :user;
+GRANT SELECT ON pglogical.node_interface TO :user;
+GRANT SELECT ON pglogical.queue TO :user;
+GRANT SELECT ON pglogical.replication_set TO :user;
+GRANT SELECT ON pglogical.replication_set_seq TO :user;
+GRANT SELECT ON pglogical.replication_set_table TO :user;
+GRANT SELECT ON pglogical.sequence_state TO :user;
+GRANT SELECT ON pglogical.subscription TO :user;
+
+\c orders;
+
+GRANT USAGE ON SCHEMA pglogical TO :user;
+GRANT ALL ON SCHEMA pglogical TO :user;
+GRANT SELECT ON pglogical.tables TO :user;
+GRANT SELECT ON pglogical.depend TO :user;
+GRANT SELECT ON pglogical.local_node TO :user;
+GRANT SELECT ON pglogical.local_sync_status TO :user;
+GRANT SELECT ON pglogical.node TO :user;
+GRANT SELECT ON pglogical.node_interface TO :user;
+GRANT SELECT ON pglogical.queue TO :user;
+GRANT SELECT ON pglogical.replication_set TO :user;
+GRANT SELECT ON pglogical.replication_set_seq TO :user;
+GRANT SELECT ON pglogical.replication_set_table TO :user;
+GRANT SELECT ON pglogical.sequence_state TO :user;
+GRANT SELECT ON pglogical.subscription TO :user;
+
+
+GRANT USAGE ON SCHEMA public TO :user;
+GRANT ALL ON SCHEMA public TO :user;
+GRANT SELECT ON public.distribution_centers TO :user;
+GRANT SELECT ON public.inventory_items TO :user;
+GRANT SELECT ON public.order_items TO :user;
+GRANT SELECT ON public.products TO :user;
+GRANT SELECT ON public.users TO :user;
+
+\c gmemegen_db;
+
+GRANT USAGE ON SCHEMA pglogical TO :user;
+GRANT ALL ON SCHEMA pglogical TO :user;
+GRANT SELECT ON pglogical.tables TO :user;
+GRANT SELECT ON pglogical.depend TO :user;
+GRANT SELECT ON pglogical.local_node TO :user;
+GRANT SELECT ON pglogical.local_sync_status TO :user;
+GRANT SELECT ON pglogical.node TO :user;
+GRANT SELECT ON pglogical.node_interface TO :user;
+GRANT SELECT ON pglogical.queue TO :user;
+GRANT SELECT ON pglogical.replication_set TO :user;
+GRANT SELECT ON pglogical.replication_set_seq TO :user;
+GRANT SELECT ON pglogical.replication_set_table TO :user;
+GRANT SELECT ON pglogical.sequence_state TO :user;
+GRANT SELECT ON pglogical.subscription TO :user;
+
+GRANT USAGE ON SCHEMA public TO :user;
+GRANT ALL ON SCHEMA public TO :user;
+
+\c orders;
+\dt
+
+
+ALTER TABLE public.distribution_centers OWNER TO :user;
+ALTER TABLE public.inventory_items OWNER TO :user;
+ALTER TABLE public.order_items OWNER TO :user;
+ALTER TABLE public.products OWNER TO :user;
+ALTER TABLE public.users OWNER TO :user;
+\dt
+
+ALTER TABLE public.inventory_items ADD PRIMARY KEY(id);
+\q 
+
+exit
+
+exit
+
+export ZONE=$(gcloud compute instances list antern-postgresql-vm --format 'csv[no-heading](zone)')
+
+export VM_INT_IP=$(gcloud compute instances describe antern-postgresql-vm --zone=$ZONE \
+  --format='get(networkInterfaces[0].networkIP)')
+echo $VM_INT_IP
+
+
+****************** follow THE VIDEO ****************
+
+Open -> Create a Migration Job 
+Link: https://console.cloud.google.com/dbmigration/migrations/create?project=qwiklabs-gcp-04-066484c56ab8
+
+
+************TASK 2************
+
+FOLLOW THE VIDEO
+
+Grant the Cymbal Owner user the Cloud SQL Admin role for the CloudSQL
+
+
+************TASK 3 & TASK 4************
+Note: For this task, you will need to log in to the Cymbal Project with the Cymbal Owner credentials.
+
+
+export VPC_NAME=vpc-network-oytz
+export SUBNET_A=subnet-a-b15t
+export REGION_A=us-central1
+export SUBNET_B=subnet-b-m905
+export REGION_B=us-east1
+export FIREWALL_1=mics-firewall-ssh
+export FIREWALL_2=qwtz-firewall-rdp
+export FIREWALL_3=bljf-firewall-icmp
+export SINK_NAME=ratings-service-error-sink
+
+gcloud compute networks create $VPC_NAME --project=$DEVSHELL_PROJECT_ID --subnet-mode=custom --mtu=1460 --bgp-routing-mode=regional
+
+gcloud compute networks subnets create $SUBNET_A --project=$DEVSHELL_PROJECT_ID --range=10.10.10.0/24 --stack-type=IPV4_ONLY --network=$VPC_NAME --region=$REGION_A
+
+gcloud compute networks subnets create $SUBNET_B --project=$DEVSHELL_PROJECT_ID --range=10.10.20.0/24 --stack-type=IPV4_ONLY --network=$VPC_NAME --region=$REGION_B
+
+gcloud compute --project=$DEVSHELL_PROJECT_ID firewall-rules create $FIREWALL_1 --direction=INGRESS --priority=65535 --network=$VPC_NAME --action=ALLOW --rules=tcp:22 --source-ranges=0.0.0.0/0
+
+gcloud compute --project=$DEVSHELL_PROJECT_ID firewall-rules create $FIREWALL_2 --direction=INGRESS --priority=65535 --network=$VPC_NAME --action=ALLOW --rules=tcp:3389 --source-ranges=0.0.0.0/0
+
+gcloud compute --project=$DEVSHELL_PROJECT_ID firewall-rules create $FIREWALL_3 --direction=INGRESS --priority=65535 --network=$VPC_NAME --action=ALLOW --rules=icmp --source-ranges=0.0.0.0/0
+
+bq mk gke_app_errors_sink
+
+gcloud logging sinks create $SINK_NAME bigquery.googleapis.com/projects/$DEVSHELL_PROJECT_ID/datasets/gke_app_errors_sink --log-filter='resource.type=resource.labels.container_name;
+severity=ERROR'
+
+******************Grant Permission FOLLOW THE VIDEO**************************
