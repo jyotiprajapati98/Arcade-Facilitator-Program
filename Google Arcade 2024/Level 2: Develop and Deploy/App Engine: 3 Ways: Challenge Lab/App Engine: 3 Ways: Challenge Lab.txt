@@ -1,0 +1,24 @@
+************************ To get this command***********************************************************************************
+Compute engine -> click on the drop down of SSH of the vm instance-> View gcloud command -> Copy the command and add --quiet
+********************************************************************************************************************************
+
+
+gcloud services enable appengine.googleapis.com
+git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+cd python-docs-samples/appengine/standard_python3/hello_world
+exit
+
+git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git
+cd python-docs-samples/appengine/standard_python3/hello_world
+gcloud app deploy
+
+*****************Update message by following the steps in Video******************
+Open editor -> python-docs-samples/appengine/standard_python3/hello_world -> main.py -> Update the return message
+******************************************************************************************************************
+
+gcloud app deploy
+
+
+*****************************************************
+Select the region 
+Press Y
