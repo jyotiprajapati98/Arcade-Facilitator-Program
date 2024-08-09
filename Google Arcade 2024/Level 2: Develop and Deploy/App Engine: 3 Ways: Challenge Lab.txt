@@ -1,5 +1,5 @@
 ************************ To get this command***********************************************************************************
-Compute engine -> click on the drop down of SSH of the vm instance-> View gcloud command -> Copy the command and add ----quiet
+Compute engine -> click on the drop down of SSH of the vm instance-> View gcloud command -> Copy the command and add --quiet
 ********************************************************************************************************************************
 
 
