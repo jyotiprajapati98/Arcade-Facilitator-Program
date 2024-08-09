@@ -1,0 +1,21 @@
+Task 1. Create a Compute Engine Virtual Machine instance
+
+Create a VM instance 
+
+
+Open -> SSH Terminal and Install software on the VM instance 
+
+sudo apt-get update
+sudo apt-get install git
+sudo apt-get install python3-setuptools python3-dev build-essential
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+sudo python3 get-pip.py --break-system-packages
+
+
+Task 2: Configure the VM to run application software
+
+python3 --version
+pip3 --version
+git clone https://github.com/GoogleCloudPlatform/training-data-analyst
+cd ~/training-data-analyst/courses/developingapps/python/devenv/
+sudo python3 server.py
