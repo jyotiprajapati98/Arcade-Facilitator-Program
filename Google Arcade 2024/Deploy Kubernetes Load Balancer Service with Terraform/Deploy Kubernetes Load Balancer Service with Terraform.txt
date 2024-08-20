@@ -1,0 +1,15 @@
+Follow the Video Instructions: 
+
+
+gsutil -m cp -r gs://spls/gsp233/* .
+cd tf-gke-k8s-service-lb
+
+terraform init
+
+#Change the region and location from task 3
+
+terraform apply -var="region=us-west1" -var="location=us-west1-c"
+
+********************************************
+
+type: yes
