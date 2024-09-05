@@ -1,0 +1,65 @@
+
+*************Task 1. Install Vault*************
+
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+
+sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+
+#Press ENTER to continue
+
+sudo apt-get update
+sudo apt-get install vault
+
+#Starting the dev server
+
+vault server -dev
+
+#copy the Unseal Key and Root Token values.
+
+*************Open a new Cloud Shell tab*************
+
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN=""
+vault status
+
+#click on the web preview icon->Change port-><given port number>
+
+#Enter your Root Token that you saved earlier in the lab and click Sign In.
+
+*************Task 3. Authentication in Vault*************
+
+vault path-help auth/my-auth
+
+**********Task 5. Using the AppRole auth method*************
+
+vault kv put secret/mysql/webapp db_name="users" username="admin" password="passw0rd"
+vault auth enable approle
+
+vault policy write jenkins -<<EOF
+# Read-only permission on secrets stored at 'secret/data/mysql/webapp'
+path "secret/data/mysql/webapp" {
+  capabilities = [ "read" ]
+}
+EOF
+
+vault write auth/approle/role/jenkins token_policies="jenkins" \
+    token_ttl=1h token_max_ttl=4h
+
+vault read auth/approle/role/Jenkins
+vault read auth/approle/role/jenkins/role-id
+vault write -force auth/approle/role/jenkins/secret-id
+
+#copy role and secret ids
+
+vault write auth/approle/login role_id=" " secret_id=" "
+
+export APP_TOKEN=" "
+VAULT_TOKEN=$APP_TOKEN vault kv get secret/mysql/webapp
+VAULT_TOKEN=$APP_TOKEN vault kv delete secret/mysql/webapp
+
+VAULT_TOKEN=$APP_TOKEN vault kv get -format=json secret/mysql/webapp | jq -r .data.data.db_name > db_name.txt
+VAULT_TOKEN=$APP_TOKEN vault kv get -format=json secret/mysql/webapp | jq -r .data.data.password > password.txt
+VAULT_TOKEN=$APP_TOKEN vault kv get -format=json secret/mysql/webapp | jq -r .data.data.username > username.txt
+
+export PROJECT_ID=$(gcloud config get-value project)
+gsutil cp *.txt gs://$PROJECT_ID
