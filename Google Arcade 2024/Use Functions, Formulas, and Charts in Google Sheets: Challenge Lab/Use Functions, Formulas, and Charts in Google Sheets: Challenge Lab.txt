@@ -1,0 +1,4 @@
+1) Download the Excel File: 
+Follow the Video
+
+2) Create Google Sheet and Paste the Chart in that, change the name of file.
