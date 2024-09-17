@@ -1,4 +1,5 @@
-1) Download the Excel File: 
+1) Download the Excel File: https://github.com/jyotiprajapati98/Arcade-Facilitator-Program/blob/324961df78384c06d44f0e5a208095096b005f9d/Google%20Arcade%202024/Use%20Functions%2C%20Formulas%2C%20and%20Charts%20in%20Google%20Sheets%3A%20Challenge%20Lab/On%20the%20Rise%20Bakery%20Business%20Challenge.xlsx
+
 Follow the Video
 
 2) Create Google Sheet and Paste the Chart in that, change the name of file.
